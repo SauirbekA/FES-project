@@ -37,3 +37,11 @@ class MyModelForm(forms.ModelForm):
     class Meta:
         model = Cart
         fields = ('idUser', 'idCourse')    
+        
+from .models import Comment
+# from django import formsclass
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('name', 'email', 'body')        

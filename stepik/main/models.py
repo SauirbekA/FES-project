@@ -14,7 +14,8 @@ class Course(models.Model):
     video = models.FileField(upload_to='video/course', blank=True)
     is_published = models.BooleanField(null=True, default=False)
     cat = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
-
+    number = models.CharField(max_length=255)
+    
     def __str__(self):
         return self.title
 
@@ -55,6 +56,10 @@ class Learner(models.Model):
     name = models.CharField(max_length=200, null=True)
     photo = models.ImageField(upload_to='photos/users/', blank=True, default='default/anonymous-user.png')    
     phone = models.CharField(max_length=20, null=True)
+    coins = models.IntegerField()
+    
+    def __str__(self):
+        return self.name
 
 class Cart(models.Model):
     idUser = models.IntegerField()
@@ -67,3 +72,18 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'id', 'email']
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Course,on_delete=models.CASCADE,related_name='comments')
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['created_on']
+
+    def __str__(self):
+        return 'Comment {} by {}'.format(self.body, self.name)

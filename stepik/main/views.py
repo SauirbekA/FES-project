@@ -14,7 +14,6 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-
 def mainpage(request):
     
     menu = Course.objects.all()
@@ -22,7 +21,7 @@ def mainpage(request):
         'title': 'Main Page',
         'menu': menu,
     }
-    return render(request,'main/mainpage.html', context=context)
+    return render(request,'main/base.html', context=context)
 
 # @allowed_users(allowed_roles=['moderator'])
 def catalogue(request): #, cat_id = 0
@@ -100,12 +99,34 @@ def coursepage(request, id):
     videos = Video.objects.filter(idCourse=id)
     menu = Course.objects.filter(id=id)
     lesson = LessonContainer.objects.filter(idUser=user, idCourse=id)
+    author = User.objects.filter(pk = menu[0].idUser).first()
+    
+    post = get_object_or_404(Course, id=id)
+    comments = post.comments.filter(active=True)
+    new_comment = None    # Comment posted
+    if request.method == 'POST':
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            # Create Comment object but don't save to database yet
+            new_comment = comment_form.save(commit=False)
+            # Assign the current post to the comment
+            new_comment.post = post
+            # Save the comment to the database
+            new_comment.save()
+    else:
+        comment_form = CommentForm()
+        
+        
     context = {
         'title': "Coursepage",
         'menu': menu,
         'videos': videos,
         'id': id,
         'lesson': lesson,
+        'comments': comments,
+        'new_comment': new_comment,
+        'comment_form': comment_form,
+        'author': author,
     }
     return render(request, 'main/coursepage.html', context=context)
 
@@ -116,6 +137,8 @@ def lesson(request, id):
     videos = Video.objects.filter(idCourse=id)
     menu = Course.objects.filter(id=id)
     lesson = LessonContainer.objects.filter(idUser=user, idCourse=id)
+    
+    
     context = {
         'title': "Coursepage",
         'menu': menu,
@@ -188,20 +211,14 @@ from django.http import HttpResponseRedirect
 
 def add_course_to_user(request, id):
     
-    course = Course.objects.filter(pk = id)
-    cost = False
-    for c in course:
-        # print("Title: ", c.price)
-        if c.price > 0:
-            cost = True
-    # print('Cost: ', cost) 
-    # print('email: ', request.user.email)       
-    if cost == True:
-        print('I am here')
-        context = {'cost': c.price, 'id': id}
+    course = Course.objects.filter(pk = id).first()
+    request.user.learner.coins -= course.price
+    request.user.learner.save() 
+         
+    if course.price > 0:
+        context = {'cost': course.price, 'id': id}
         return render(request, 'main/payment.html', context) 
-    else:
-           
+    else:  
         user = request.user.pk
         lesson = LessonContainer.objects.create(idUser=user, idCourse=id)
         return redirect('profile')    
@@ -211,10 +228,10 @@ def pay(request, id):
     lesson = LessonContainer.objects.create(idUser=user, idCourse=id)
     name = Course.objects.filter(pk = id)
     
-    try:
-        send_mail('FES team', f'You successfully purchased the course: {name[0].title} for {name[0].price}$', 'a.nurmuhan03@gmail.com', ['artikbaisauirbek@gmail.com'])
-    except BadHeaderError:
-        return HttpResponse('Invalid header found.')    
+    # try:
+    #     send_mail('FES team', f'You successfully purchased the course: {name[0].title} for {name[0].price}$', 'a.nurmuhan03@gmail.com', ['artikbaisauirbek@gmail.com'])
+    # except BadHeaderError:
+    #     return HttpResponse('Invalid header found.')    
     return redirect('profile')
     
 
@@ -283,7 +300,7 @@ def send_message(request):
     url = "https://api.telegram.org/bot" + telegram_bot_id + "/sendMessage"
     response = requests.post(url, json=data)
     # return JsonResponse({'status': response.status_code})    
-    return render(request, 'main/mainpage.html')
+    return render(request, 'main/base.html')
 
 
 def currency(request):
@@ -361,53 +378,39 @@ def payall(request):
     
     return redirect('profile')
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.forms import model_to_dict
-from .serializer import UserSerializer
-from django.contrib.auth.models import User
-from rest_framework.generics import RetrieveUpdateAPIView
 
-class UserDetail(RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-# class UserList(APIView):
-#     def get(self, request, id):
-#         users = User.objects.filter(pk = id)
+    
+    
+# class UserListAll(APIView):
+#     def get(self, request):
+#         users = User.objects.all()
 #         serializer = UserSerializer(users, many=True)
-#         return Response(serializer.data)
-    
-    
-class UserListAll(APIView):
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)   
+#         return Response(serializer.data)   
      
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(model_to_dict(user))
+#     def post(self, request):
+#         serializer = UserSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.save()
+#         return Response(model_to_dict(user))
     
     
-import requests
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
+# import requests
+# from django.shortcuts import render
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
 
-class SendMessageView(APIView):
-    def post(self, request, format=None):
-        data = request.data
-        # data = {'form': 'hello'}
-        response = requests.post('http://localhost:4000/receive_message/', data=data)
-        print('Proceed')
-        return Response(response.json())
+# class SendMessageView(APIView):
+#     def post(self, request, format=None):
+#         data = request.data
+#         # data = {'form': 'hello'}
+#         response = requests.post('http://localhost:4000/receive_message/', data=data)
+#         print('Proceed')
+#         return Response(response.json())
 
-def map(request):
-    context = {
-        'title': 'Maps'
-    } 
+# def map(request):
+#     context = {
+#         'title': 'Maps'
+#     } 
     
-    return render(request, 'main/map.html', context)
+#     return render(request, 'main/map.html', context)
+

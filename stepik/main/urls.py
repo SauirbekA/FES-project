@@ -30,10 +30,12 @@ urlpatterns = [
     path('cart/', views.cart, name='cart'),
     path('payall/', views.payall, name='payall'),
     # path('api/<int:id>', views.UserList.as_view(), name='api'),
-    path('api/', views.UserListAll.as_view(), name='apiall'),
-    path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
-    path('send_message/', views.SendMessageView.as_view(), name='send_message'), 
-    path('map/', views.map, name='map'),
+    # path('api/', views.UserListAll.as_view(), name='apiall'),
+    # path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
+    # path('send_message/', views.SendMessageView.as_view(), name='send_message'), 
+    # path('map/', views.map, name='map'),
+    
+    
 ]
     
 
