@@ -26,7 +26,7 @@ def register(request):
             return redirect('mainpage')
            
     context = {'form': form, }
-    return render(request, 'Register/register.html', context)
+    return render(request, 'register/register.html', context)
 
 
 login = unauthenticated_user(login)

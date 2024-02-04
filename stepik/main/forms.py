@@ -23,7 +23,7 @@ class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = Learner
         fields = '__all__'
-        exclude=['user']
+        exclude=['user', 'coins']
         
 
 class YourForm(forms.Form):

@@ -185,7 +185,7 @@ def accountSettings(request):
         print(post)
         user = request.user.learner
     else:
-        Learner.objects.create(user_id=request.user.pk, name=request.user.username)
+        Learner.objects.create(user_id=request.user.pk, name=request.user.username, coins=100)
         user = request.user.learner
 
     form = UpdateUserForm(instance=user)
@@ -212,9 +212,11 @@ from django.http import HttpResponseRedirect
 def add_course_to_user(request, id):
     
     course = Course.objects.filter(pk = id).first()
-    request.user.learner.coins -= course.price
-    request.user.learner.save() 
-         
+    if request.user.learner.coins >= course.price:
+        request.user.learner.coins -= course.price
+        request.user.learner.save() 
+    else:
+        return redirect('profile')      
     if course.price > 0:
         context = {'cost': course.price, 'id': id}
         return render(request, 'main/payment.html', context) 
