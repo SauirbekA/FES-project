@@ -41,7 +41,7 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
       <span class="navbar-toggler-icon"></span>
       <img src="{% static 'django.webp' %}" alt="Logo" width="25"> 
-      </button> <a class="navbar-brand" href="{% url 'mainpage' %}">Skillswap</a>
+      </button> <a class="navbar-brand" href="{% url 'mainpage' %}">SkillSwap</a>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="navbar-nav">
@@ -120,6 +120,85 @@
 
   </section><!-- End Hero -->
     
+
+
+  <!-- ======= Features Section ======= -->
+  <section id="features" class="features" data-aos="fade-up">
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Features</h2>
+        <p>Explore the diverse features of SkillSwap, your gateway to limitless learning opportunities.</p>
+      </div>
+
+      <div class="row content">
+        <div class="col-md-5" data-aos="fade-right" data-aos-delay="100">
+          <img src="/media/assets/img/features-1.png" class="img-fluid" alt="SkillSwap Feature 1">
+        </div>
+        <div class="col-md-7 pt-4" data-aos="fade-left" data-aos-delay="100">
+          <h3>Unlock Your Potential with SkillSwap</h3>
+          <p class="fst-italic">
+            Embark on a journey of knowledge with SkillSwap, where learning knows no bounds.
+          </p>
+          <ul>
+            <li><i class="bi bi-check"></i> Access a wide range of courses on various subjects.</li>
+            <li><i class="bi bi-check"></i> Engage in interactive learning experiences.</li>
+            <li><i class="bi bi-check"></i> Learn at your own pace with flexible schedules.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row content">
+        <div class="col-md-5 order-1 order-md-2" data-aos="fade-left">
+          <img src="/media/assets/img/features-2.png" class="img-fluid" alt="SkillSwap Feature 2">
+        </div>
+        <div class="col-md-7 pt-5 order-2 order-md-1" data-aos="fade-right">
+          <h3>Dive Deep into Expert-Led Courses</h3>
+          <p class="fst-italic">
+            Immerse yourself in high-quality courses led by industry experts.
+          </p>
+          <p>
+            SkillSwap provides a platform for expert instructors to share their knowledge, ensuring a top-notch learning experience for all participants.
+          </p>
+        </div>
+      </div>
+
+      <div class="row content">
+        <div class="col-md-5" data-aos="fade-right">
+          <img src="/media/assets/img/features-3.png" class="img-fluid" alt="SkillSwap Feature 3">
+        </div>
+        <div class="col-md-7 pt-5" data-aos="fade-left">
+          <h3>Explore Diverse Subjects</h3>
+          <p>
+            SkillSwap offers a vast array of subjects, from technology and arts to business and health. Discover your passion and expand your knowledge in areas that interest you the most.
+          </p>
+          <ul>
+            <li><i class="bi bi-check"></i> Choose from a wide variety of course categories.</li>
+            <li><i class="bi bi-check"></i> Stay updated with the latest trends and advancements.</li>
+            <li><i class="bi bi-check"></i> Learn from industry-specific experts.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row content">
+        <div class="col-md-5 order-1 order-md-2" data-aos="fade-left">
+          <img src="/media/assets/img/features-4.png" class="img-fluid" alt="SkillSwap Feature 4">
+        </div>
+        <div class="col-md-7 pt-5 order-2 order-md-1" data-aos="fade-right">
+          <h3>Connect with a Global Community</h3>
+          <p class="fst-italic">
+            Join a vibrant community of learners and instructors from around the world.
+          </p>
+          <p>
+            SkillSwap fosters collaboration and networking, allowing you to connect with like-minded individuals, share experiences, and engage in discussions to enhance your learning journey.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section><!-- End Features Section -->
+
+
 
    <center style="text-decoration: dotted;"> <h2 class="fst-italic">If you have any questions, contact us here!</h2></center><br>
     <div class="container d-flex align-items-center justify-content-center">
@@ -211,22 +290,12 @@
             <ul>
               <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
               <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#features">Features</a></li>
+              <!-- <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li> -->
             </ul>
           </div>
 
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Our Services</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Design</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Development</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Product Management</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Marketing</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Graphic Design</a></li>
-            </ul>
-          </div>
 
           <!-- <div class="col-lg-4 col-md-6 footer-newsletter">
             <h4>Join Our Newsletter</h4>
@@ -254,13 +323,7 @@
           <!-- Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> -->
         </div>
       </div>
-      <div class="social-links text-center text-md-right pt-3 pt-md-0">
-        <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-        <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-        <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-        <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-        <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-      </div>
+      
     </div>
   </footer><!-- End Footer -->
 
@@ -282,6 +345,8 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
 </body>
 </html>
 

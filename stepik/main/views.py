@@ -212,8 +212,10 @@ from django.http import HttpResponseRedirect
 def add_course_to_user(request, id):
     
     course = Course.objects.filter(pk = id).first()
+    usera = User.objects.filter(id = course.idUser).first()
     if request.user.learner.coins >= course.price:
         request.user.learner.coins -= course.price
+        usera.learner.coins += course.price
         request.user.learner.save() 
     else:
         return redirect('profile')      

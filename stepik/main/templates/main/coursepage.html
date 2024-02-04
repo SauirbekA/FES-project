@@ -44,7 +44,7 @@
                       </form>
 
                 {% elif user.groups.first.name == 'teacher' %}    
-                <p>You are teacher</p>  
+                <p>You are the author</p>  
                 {% else %} 
                         {% if lesson %}
                         <h3><a class="btn btn-danger" href="{% url 'delete_course_from_user' id %}">UnEnroll from a Course</a></h3>
