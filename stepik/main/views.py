@@ -13,6 +13,11 @@ from django.core.mail import send_mail, BadHeaderError
 import smtplib
 from email.mime.text import MIMEText
 
+from .forms import MyModelForm
+from django.http import JsonResponse
+import requests
+from django.db.models import Avg
+
 
 def mainpage(request):
     
@@ -53,7 +58,7 @@ def category(request, cat_id):
 
 
 @login_required
-@allowed_users(allowed_roles=['teacher'])
+# @allowed_users(allowed_roles=['teacher'])
 def create(request):
     id = request.user.pk
     if request.method == 'POST':
@@ -72,25 +77,25 @@ def create(request):
     }
     return render(request, 'main/create.html', context=context)
 
-@login_required
-@allowed_users(allowed_roles=['teacher'])
-def create_lesson(request, id):
-    if request.method == 'POST':
-        form = AddLessonForm(request.POST, request.FILES, initial={'idCourse': id})
-        if form.is_valid():
-            try:
-                form.save()
-                return redirect( f'/coursepage/{id}' )
-            except:
-                form.add_error(None, "Error at adding Lesson")
-    else:
-        form = AddLessonForm(initial={'idCourse': id})
-    context = {
-        'title': 'Create lesson',
-        'form': form,
-        'id': id,
-    }
-    return render(request, 'main/create_lesson.html', context=context)
+# @login_required
+# # @allowed_users(allowed_roles=['teacher'])
+# def create_lesson(request, id):
+#     if request.method == 'POST':
+#         form = AddLessonForm(request.POST, request.FILES, initial={'idCourse': id})
+#         if form.is_valid():
+#             try:
+#                 form.save()
+#                 return redirect( f'/coursepage/{id}' )
+#             except:
+#                 form.add_error(None, "Error at adding Lesson")
+#     else:
+#         form = AddLessonForm(initial={'idCourse': id})
+#     context = {
+#         'title': 'Create lesson',
+#         'form': form,
+#         'id': id,
+#     }
+#     return render(request, 'main/create_lesson.html', context=context)
     
 
 @login_required
@@ -150,32 +155,53 @@ def lesson(request, id):
 
 
 
-
-
-
-
-
 @login_required
 def profile(request):
     user = request.user.pk
     course = Course.objects.filter(idUser=user)
     container = LessonContainer.objects.filter(idUser=user)
     UserChoice = Course.objects.all()
-    group = request.user.groups.all()[0].name
+    # group = request.user.groups.all()[0].name
     context = {
         'title': "Profile page",
         'course': course,
         'container': container,
         'UserChoice': UserChoice,
-        'group': group,
+        'group': "",
     }
     return render(request, 'main/profile.html', context=context)
+
+
+
+
+# def searchbar(request):
+#     if request.method == 'GET':
+#         search = request.GET.get('search')
+#         post = Course.objects.all().filter(title__contains=search, is_published=True)
+#         return render(request, 'main/searchbar.html', {'post': post})
 
 def searchbar(request):
     if request.method == 'GET':
         search = request.GET.get('search')
-        post = Course.objects.all().filter(title__contains=search, is_published=True)
-        return render(request, 'main/searchbar.html', {'post': post})
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
+        min_rating = request.GET.get('min_rating')
+
+        # Base queryset
+        queryset = Course.objects.all().filter(title__contains=search, is_published=True)
+
+        # Apply price filter
+        if min_price is not None and min_price.isdigit():
+            queryset = queryset.filter(price__gte=float(min_price))
+        if max_price is not None and max_price.isdigit():
+            queryset = queryset.filter(price__lte=float(max_price))
+
+        # Apply average rating filter
+        if min_rating is not None and min_rating.isdigit():
+            queryset = queryset.annotate(avg_rating=Avg("comments__rate")).filter(avg_rating__gte=float(min_rating))
+
+        return render(request, 'main/searchbar.html', {'post': queryset})
+
 
 
 
@@ -207,8 +233,6 @@ def accountSettings(request):
 
 
 
-from django.http import HttpResponseRedirect
-
 def add_course_to_user(request, id):
     
     course = Course.objects.filter(pk = id).first()
@@ -217,6 +241,7 @@ def add_course_to_user(request, id):
         request.user.learner.coins -= course.price
         usera.learner.coins += course.price
         request.user.learner.save() 
+        usera.learner.save()
     else:
         return redirect('profile')      
     if course.price > 0:
@@ -227,27 +252,30 @@ def add_course_to_user(request, id):
         lesson = LessonContainer.objects.create(idUser=user, idCourse=id)
         return redirect('profile')    
         
+        
+        
 def pay(request, id):   
     user = request.user.pk
     lesson = LessonContainer.objects.create(idUser=user, idCourse=id)
     name = Course.objects.filter(pk = id)
-    
-    # try:
-    #     send_mail('FES team', f'You successfully purchased the course: {name[0].title} for {name[0].price}$', 'a.nurmuhan03@gmail.com', ['artikbaisauirbek@gmail.com'])
-    # except BadHeaderError:
-    #     return HttpResponse('Invalid header found.')    
+       
     return redirect('profile')
     
+
 
 def delete_course_from_user(request, id):
     user = request.user.pk
     lesson = LessonContainer.objects.filter(idUser=user, idCourse=id).delete()
     return redirect('profile')
     
+    
+    
 def delete_course(request, id):
     user = request.user.pk
     course = Course.objects.filter(pk=id).delete()
     return redirect('profile')
+
+
 
 @allowed_users(allowed_roles=['moderator'])
 def accept_course(request, id):
@@ -261,12 +289,6 @@ def accept_course(request, id):
     return redirect('moderator')
 
 
-
-# def send_form_to_telegram_bot(form_data):
-#     # Create a bot object using the API token
-#     bot = Bot(token='YOUR_API_TOKEN')
-#     # Send the form data to the Telegram chat
-#     bot.send_message(chat_id='YOUR_CHAT_ID', text=form_data)
 
 @allowed_users(allowed_roles=['moderator'])
 def moderator(request):
@@ -282,8 +304,6 @@ def moderator(request):
     return render(request, 'main/moderator.html', context)
 
 
-from django.http import JsonResponse
-import requests
 
 @login_required
 def send_message(request):
@@ -307,29 +327,6 @@ def send_message(request):
     return render(request, 'main/base.html')
 
 
-def currency(request):
-    driver = webdriver.Chrome()
-    driver.get('https://ru.investing.com/currencies/usd-kzt?ysclid=le3xenttgf36537185')
-
-    course = driver.find_element('xpath', "//span[contains(@class, 'text-2xl')]")
-    resultk, resultu = 0, 0
-    if request.method == 'POST':
-        input_valuek = int(request.POST['input_valuek'])
-        input_valueu = int(request.POST['input_valueu'])
-        resultu = input_valuek * float(course.text[:3])
-        resultk = float(course.text[:3]) // input_valueu
-        
-    
-    context = {
-        'title': 'Main Page',
-        'course': float(course.text[:3]),
-        'result': resultk,
-        'resultu': resultu,
-    }
-    return render(request,'main/currency.html', context=context)
-
-from .forms import MyModelForm
-
 
 def my_view(request, id):
     my_model_instance = Cart(idUser = request.user.pk, idCourse = id)
@@ -348,39 +345,78 @@ def my_view(request, id):
     }    
     return render(request, 'main/coursepage.html', context)
 
-def cart(request):
 
-    cartItems = Cart.objects.filter(idUser = request.user.pk)
-    cart = []
-    idc = []
-    price = []
-    for c in cartItems:
-        course = Course.objects.filter(pk =c.idCourse)
-        cart.append([course[0].title, course[0].price])
-        idc.append(c.idCourse)
-        price.append(course[0].price)
-    overall = 0    
-    for p in price:
-        overall+=p
+
+def top_page(request):
+    courses_list = Course.objects.annotate(avg_rating=Avg('comments__rate')).order_by('-avg_rating')
+    return render(request, 'main/top_page.html', {'courses_list': courses_list})
+
+
+
+
+
+
+
+
+
+
+
+
+# def currency(request):
+#     driver = webdriver.Chrome()
+#     driver.get('https://ru.investing.com/currencies/usd-kzt?ysclid=le3xenttgf36537185')
+
+#     course = driver.find_element('xpath', "//span[contains(@class, 'text-2xl')]")
+#     resultk, resultu = 0, 0
+#     if request.method == 'POST':
+#         input_valuek = int(request.POST['input_valuek'])
+#         input_valueu = int(request.POST['input_valueu'])
+#         resultu = input_valuek * float(course.text[:3])
+#         resultk = float(course.text[:3]) // input_valueu
+        
+    
+#     context = {
+#         'title': 'Main Page',
+#         'course': float(course.text[:3]),
+#         'result': resultk,
+#         'resultu': resultu,
+#     }
+#     return render(request,'main/currency.html', context=context)
+
+
+# def cart(request):
+
+#     cartItems = Cart.objects.filter(idUser = request.user.pk)
+#     cart = []
+#     idc = []
+#     price = []
+#     for c in cartItems:
+#         course = Course.objects.filter(pk =c.idCourse)
+#         cart.append([course[0].title, course[0].price])
+#         idc.append(c.idCourse)
+#         price.append(course[0].price)
+#     overall = 0    
+#     for p in price:
+#         overall+=p
             
-    context = {
-        'cart': cart,
-        'price': price,
-        'overall': overall,
-        'idc': idc,
-    }
-    return render(request, 'main/cart.html', context)
+#     context = {
+#         'cart': cart,
+#         'price': price,
+#         'overall': overall,
+#         'idc': idc,
+#     }
+#     return render(request, 'main/cart.html', context)
 
-def payall(request):
-    user = request.user.pk
-    cartItems = Cart.objects.filter(idUser = request.user.pk)
+# def payall(request):
+#     user = request.user.pk
+#     cartItems = Cart.objects.filter(idUser = request.user.pk)
     
-    for c in cartItems:
-        lesson = LessonContainer.objects.create(idUser=user, idCourse=c.idCourse)
-        lesson.save()
-        Cart.objects.filter(idCourse = c.idCourse).delete()
+#     for c in cartItems:
+#         lesson = LessonContainer.objects.create(idUser=user, idCourse=c.idCourse)
+#         lesson.save()
+#         Cart.objects.filter(idCourse = c.idCourse).delete()
     
-    return redirect('profile')
+#     return redirect('profile')
 
 
     

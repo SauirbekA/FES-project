@@ -11,8 +11,8 @@ urlpatterns = [
     path('coursepage/<int:id>/', views.coursepage, name='coursepage'),
     path('profile/', views.profile, name='profile'),
     path('searchbar/', views.searchbar, name='searchbar'),
-    path('create_lesson/<int:id>/', views.create_lesson, name='create_lesson'),
-    path('lesson/<int:id>/', views.lesson, name='lesson'),
+    # path('create_lesson/<int:id>/', views.create_lesson, name='create_lesson'),
+    # path('lesson/<int:id>/', views.lesson, name='lesson'),
 
     
     path('add_course_to_user/<int:id>', views.add_course_to_user, name='add_course_to_user'),
@@ -23,12 +23,14 @@ urlpatterns = [
     path('accountSettings', views.accountSettings, name='accountSettings'),
     path('moderator/', views.moderator, name='moderator'),
     path('send-message/', views.send_message, name='send_message'),
-    
-    
-    path('currency/', views.currency, name='currency'),
     path('my_view/<int:id>', views.my_view, name='my_view'),
-    path('cart/', views.cart, name='cart'),
-    path('payall/', views.payall, name='payall'),
+    
+    path('top_page/', views.top_page, name='top_page'),
+    
+    # path('currency/', views.currency, name='currency'),
+    
+    # path('cart/', views.cart, name='cart'),
+    # path('payall/', views.payall, name='payall'),
     # path('api/<int:id>', views.UserList.as_view(), name='api'),
     # path('api/', views.UserListAll.as_view(), name='apiall'),
     # path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),

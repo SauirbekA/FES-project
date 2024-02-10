@@ -1,11 +1,14 @@
 from django import forms
 from .models import *
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class AddPostForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = '__all__'
         exclude=['is_published']
+
 
 class AddLessonForm(forms.ModelForm):
     class Meta:
@@ -18,6 +21,7 @@ class AddCourseToUserForm(forms.ModelForm):
     class Meta:
         model = LessonContainer
         fields = '__all__'        
+
 
 class UpdateUserForm(forms.ModelForm):
     class Meta:
@@ -32,16 +36,16 @@ class YourForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea)        
     
     
-
 class MyModelForm(forms.ModelForm):
     class Meta:
         model = Cart
         fields = ('idUser', 'idCourse')    
         
-from .models import Comment
-# from django import formsclass
 
 class CommentForm(forms.ModelForm):
+    rate = forms.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
     class Meta:
         model = Comment
-        fields = ('name', 'email', 'body')        
+        fields = ('name', 'email','rate', 'body',)        

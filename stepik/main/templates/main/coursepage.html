@@ -64,9 +64,11 @@
 
 
                 
-                <span><img class="m-3" src="{{ m.photo.url }}" width="200" height="200" alt="MyPhoto" align="left"> &ensp;  <h3 class="fw-bold">{{m.title}}</h3> </span>
+                <span><img class="m-3" src="{{ m.photo.url }}" width="200" height="200" alt="MyPhoto" align="left"> &ensp;  
+                        <h3 class="fw-bold">{{m.title}}</h3> </span><span class="fa fa-star checked" style="color: orange;"></span>
+                        {{m.average_rating|floatformat:1}}
                       
-                <p class="my-3 pb-5 col-8">{{m.content}} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, voluptate obcaecati ducimus suscipit eaque animi cumque ut! Deserunt ab hic eos, minima, mollitia temporibus, repudiandae voluptates tempore reiciendis soluta odio.</p>
+                <p class="my-3 pb-5 col-8">{{m.content}}</p>
                 <p class="my-3 pb-5 col-8"><img src="/media/coin.png" alt="no" style="width: 20px; height: 20px"> {{m.price}} </p>
 
 
@@ -86,25 +88,23 @@
                 <h2>Author: </h2>
                 <span><img class="m-3" src="{{ author.learner.photo.url }}" width="200" height="200" alt="MyPhoto" align="centre"> &ensp;  <h3 class="fw-bold">{{author.learner.name}}</h3> </span>
                 </div></center>
-                <!-- {% if m.idUser == user.pk %}
-                        <center><a href="{% url 'create_lesson' m.pk %}" class="btn btn-outline-info">Create lesson</a></center>
-                {% endif %} -->
+                {% if m.idUser == user.pk %}
+                        <center><a href="#" class="btn btn-outline-info">This is your course</a></center>
+                {% endif %}
 
               
                 
                 <br> <br> 
-                <!-- <h1 class="mb-5" ><a href="{% url 'lesson' id %}">Go to lessons</a></h1> -->
-                {% if lesson or user.groups.first.name == 'moderator' or user.groups.first.name == 'teacher' %}
-                        <!-- <center><a href="{% url 'lesson' id %}" class="btn btn-primary">Go to the lessons</a></center> -->
+                {% if lesson  %}
                         <center><a href="#" class="btn btn-primary">Contacts: {{m.number|linebreaks}}</a></center>
                 {% else %}             
                         <center><h3><a class="btn btn-primary" href="#enroll">Enroll first to see contacts</a></h3></center>                
                 {% endif %}
-                
-                <!-- <center><a href="{% url 'lesson' id %}" class="btn btn-primary">Go to the lessons</a></center> -->
                 <br>
 
+                
                 {% for comment in comments %}
+                <h3>Comments</h3>
                         <div class="comments" style="padding: 10px;"> 
                         <p class="font-weight-bold"> 
                         {{ comment.name }} 
@@ -112,24 +112,55 @@
                         {{ comment.created_on }}
                         </span>
                         </p>
+                        </span><span class="fa fa-star checked" style="color: orange;"></span>
+                        {{comment.rate}}
                         {{ comment.body | linebreaks }}
                         </div>
                         {% endfor %}
-
-                <div class="card-body">
+                        <center>               
+                <!-- <div class="card-body">
                         {% if new_comment %}
-                        <div class="alert alert-success" role="alert" pl-4>
+                            <div class="alert alert-success" role="alert" pl-4>
                                 You successfully posted a comment
-                        </div>
+                            </div>
                         {% else %}
-                        <h3>Leave a comment</h3>
-                        <form method="post" style="margin-top: 1.3em;">
+                            <h3>Leave a comment</h3>
+                            <form method="post" style="margin-top: 1.3em;">
                                 {{ comment_form.as_p }}
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-primary  btn-lg">Submit</button>
-                        </form>
+                    
+                                {% if comment_form.errors.rate %}
+                                    <div class="alert alert-warning" role="alert">
+                                        {{ comment_form.errors.rate }}
+                                    </div>
+                                {% endif %}
+                    
+                                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                            </form>
                         {% endif %}
-                        </div>
+                    </div> -->
+                    <div class="card-body">
+                        {% if new_comment %}
+                            <div class="alert alert-success" role="alert">
+                                <strong>Success!</strong> You successfully posted a comment.
+                            </div>
+                        {% else %}
+                            <h3>Leave a comment</h3>
+                            <form method="post" style="margin-top: 1.3em;">
+                                {{ comment_form.as_p }}
+                                {% csrf_token %}
+                    
+                                {% if comment_form.errors.rate %}
+                                    <div class="alert alert-warning" role="alert">
+                                        <strong>Warning!</strong> {{ comment_form.errors.rate }}
+                                    </div>
+                                {% endif %}
+                    
+                                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </center>
 <!-- btn btn-success -->
 
         {% endfor %}

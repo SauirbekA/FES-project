@@ -18,9 +18,12 @@
           <!--Capthca link  -->
         <!-- <script src="https://www.google.com/recaptcha/enterprise.js?render=6LfUim4kAAAAAFdvAdzFkzmEPYxebznU0UGI40Yq"></script>
         <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
-        
-    
       
+        <!-- star rating link  -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+      <!-- local bootstrap -->
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="{% static 'main/mainform.css' %}" rel="stylesheet">
       
@@ -56,25 +59,52 @@
           {% if user.groups.first.name == 'moderator' and user.is_authenticated %} <a class="nav-link" href="{% url 'moderator' %}">Moderator</a> {% endif %}
        </li>
       </ul>
-      <form class="form-inline" action="{% url 'searchbar' %}" method="get">
+
+
+
+
+      <!-- <form class="form-inline" action="{% url 'searchbar' %}" method="get">
         <input class="form-control mr-sm-2" type="text" name="search"> 
         <button class="btn btn-primary my-2 my-sm-0" type="submit">
           Search
         </button>
-      </form>
+      </form> -->
+
+      <form class="form-inline" action="{% url 'searchbar' %}" method="get">
+        <input class="form-control mr-sm-2" type="text" name="search" placeholder="Search">
+        <li class="btn">
+          <a class="dropdown-toggle" href="#" data-toggle="dropdown">More</a>
+          <div class="dropdown-menu " aria-labelledby="navbarDropdownMenuLink">
+            <input class="form-control mr-sm-2" type="number" name="min_price" placeholder="Min Price">
+            <input class="form-control mr-sm-2 " type="number" name="max_price" placeholder="Max Price">
+            <input class="form-control mr-sm-2" type="number" name="min_rating" placeholder="Min Rating">
+          </div>
+        </li>
+      
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">
+            Search
+        </button>
+    </form>
+    
+
+
       <ul class="navbar-nav ml-md-auto">
         <li class="nav-item active">
-          {% if user.groups.first.name == 'teacher' and user.is_authenticated %} <a class="nav-link" href="{% url 'create' %}">Create course <span class="sr-only">(current)</span></a> {% endif %}
+          {%if  user.is_authenticated %} <a class="nav-link" href="{% url 'create' %}">Create course <span class="sr-only">(current)</span></a> {% endif %}
         </li>
         <li class="nav-item active">
-          {% if not user.groups.first.name == 'learner' and  user.is_authenticated %} <a class="nav-link" href="/admin">Admin<span class="sr-only">(current)</span></a> {% endif %}
+          {%if user.is_authenticated %} <a class="nav-link" href="/admin">Admin<span class="sr-only">(current)</span></a> {% endif %}
         </li>
+        <!-- <li class="nav-item active">
+          {%if user.is_authenticated %} <a class="nav-link" href="/top_page">Top<span class="sr-only">(current)</span></a> {% endif %}
+        </li> -->
         <li class="nav-item active">
           {% if  user.is_authenticated %}
           <!-- <img src="media/coin.png" alt="no" style="width: 20px; height: 20px"> -->
            <p class="nav-link"><img src="/media/coin.png" alt="no" style="width: 20px; height: 20px"> {{user.learner.coins}}<span class="sr-only">(current)</span></a>
            {% endif %}
         </li>
+
         <li class="nav-item dropdown">
            <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown">{{user}}</a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
@@ -83,6 +113,7 @@
             </div> <a class="btn btn-danger dropdown-item" href="{% url 'logout' %}">Log out</a>
           </div>
         </li>
+
       </ul>
     </div>
   </nav>
