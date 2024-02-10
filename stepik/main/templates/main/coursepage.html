@@ -96,7 +96,7 @@
                 <!-- <h1 class="mb-5" ><a href="{% url 'lesson' id %}">Go to lessons</a></h1> -->
                 {% if lesson or user.groups.first.name == 'moderator' or user.groups.first.name == 'teacher' %}
                         <!-- <center><a href="{% url 'lesson' id %}" class="btn btn-primary">Go to the lessons</a></center> -->
-                        <center><a href="#" class="btn btn-primary">Contacts: {{m.number}}</a></center>
+                        <center><a href="#" class="btn btn-primary">Contacts: {{m.number|linebreaks}}</a></center>
                 {% else %}             
                         <center><h3><a class="btn btn-primary" href="#enroll">Enroll first to see contacts</a></h3></center>                
                 {% endif %}
@@ -119,7 +119,7 @@
                 <div class="card-body">
                         {% if new_comment %}
                         <div class="alert alert-success" role="alert" pl-4>
-                                Your comment is awaiting moderation
+                                You successfully posted a comment
                         </div>
                         {% else %}
                         <h3>Leave a comment</h3>

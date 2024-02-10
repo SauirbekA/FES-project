@@ -14,7 +14,7 @@ class Course(models.Model):
     video = models.FileField(upload_to='video/course', blank=True)
     is_published = models.BooleanField(null=True, default=False)
     cat = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
-    number = models.CharField(max_length=255)
+    number = models.TextField()
     
     def __str__(self):
         return self.title
@@ -80,7 +80,7 @@ class Comment(models.Model):
     email = models.EmailField()
     body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     
     class Meta:
         ordering = ['created_on']
