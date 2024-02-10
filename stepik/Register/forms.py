@@ -8,11 +8,11 @@ from .models import *
 
 
 class CreateUserForm(UserCreationForm):
-    group = forms.ModelChoiceField(queryset=Group.objects.exclude(name__exact='moderator'), required=True)
+    # group = forms.ModelChoiceField(queryset=Group.objects.exclude(name__exact='moderator'), required=True)
     captcha = CaptchaField()
     class Meta:
         model = User
-        fields = ['username', 'email', 'group', 'captcha', 'password1', 'password2']
+        fields = ['username', 'email', 'captcha', 'password1', 'password2']
 
 
 
