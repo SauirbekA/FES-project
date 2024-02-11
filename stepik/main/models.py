@@ -86,6 +86,8 @@ class Learner(models.Model):
     photo = models.ImageField(upload_to='photos/users/', blank=True, default='default/anonymous-user.png')    
     phone = models.CharField(max_length=20, null=True)
     coins = models.IntegerField()
+    instagram = models.CharField(max_length=200, null=True, blank=True)
+    tiktok = models.CharField(max_length=200, null=True, blank=True)
     
     def __str__(self):
         return self.name

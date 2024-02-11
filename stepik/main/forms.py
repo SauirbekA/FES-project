@@ -27,7 +27,18 @@ class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = Learner
         fields = '__all__'
-        exclude=['user', 'coins']
+        exclude = ['user', 'coins']
+
+    instagram = forms.CharField(required=False)
+    tiktok = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(UpdateUserForm, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        instance = super(UpdateUserForm, self).save(*args, **kwargs)
+        return instance
         
 
 class YourForm(forms.Form):

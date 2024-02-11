@@ -98,30 +98,92 @@ def create(request):
 #     return render(request, 'main/create_lesson.html', context=context)
     
 
+# @login_required
+# def coursepage(request, id):
+#     user = request.user.pk
+#     videos = Video.objects.filter(idCourse=id)
+#     menu = Course.objects.filter(id=id)
+#     lesson = LessonContainer.objects.filter(idUser=user, idCourse=id)
+#     author = User.objects.filter(pk = menu[0].idUser).first()
+    
+#     post = get_object_or_404(Course, id=id)
+#     comments = post.comments.filter(active=True)
+#     new_comment = None    # Comment posted
+#     if request.method == 'POST':
+#         comment_form = CommentForm(data=request.POST)
+#         if comment_form.is_valid():
+#             # Create Comment object but don't save to database yet
+#             new_comment = comment_form.save(commit=False)
+#             # Assign the current post to the comment
+#             new_comment.post = post
+#             # Save the comment to the database
+#             new_comment.save()
+#     else:
+#         comment_form = CommentForm()
+        
+        
+#     context = {
+#         'title': "Coursepage",
+#         'menu': menu,
+#         'videos': videos,
+#         'id': id,
+#         'lesson': lesson,
+#         'comments': comments,
+#         'new_comment': new_comment,
+#         'comment_form': comment_form,
+#         'author': author,
+#     }
+#     return render(request, 'main/coursepage.html', context=context)
+
 @login_required
 def coursepage(request, id):
-    user = request.user.pk
+    user = request.user
     videos = Video.objects.filter(idCourse=id)
     menu = Course.objects.filter(id=id)
-    lesson = LessonContainer.objects.filter(idUser=user, idCourse=id)
-    author = User.objects.filter(pk = menu[0].idUser).first()
-    
+    lesson = LessonContainer.objects.filter(idUser=user.pk, idCourse=id)
+    author = User.objects.filter(pk=menu[0].idUser).first()
+
     post = get_object_or_404(Course, id=id)
     comments = post.comments.filter(active=True)
     new_comment = None    # Comment posted
+
+    # Check if the user has already commented by checking the cookie
+    cookie_key = f'has_commented_before_{user.pk}_{id}'
+    has_commented_before = request.COOKIES.get(cookie_key, False)
+
     if request.method == 'POST':
         comment_form = CommentForm(data=request.POST)
         if comment_form.is_valid():
-            # Create Comment object but don't save to database yet
+            if not has_commented_before:
+                # User is commenting for the first time
+                # Add coins to the user's account
+                user.learner.coins += 5
+                user.learner.save()
+
+                context = {
+                    'title': "Coursepage",
+                    'menu': menu,
+                    'videos': videos,
+                    'id': id,
+                    'lesson': lesson,
+                    'comments': comments,
+                    'new_comment': new_comment,
+                    'comment_form': comment_form,
+                    'author': author,
+                }
+
+                # Set a cookie to remember that the user has commented
+                response = render(request, 'main/coursepage.html', context=context)
+                response.set_cookie(cookie_key, True)
+                return response
+
+            # User has commented before
             new_comment = comment_form.save(commit=False)
-            # Assign the current post to the comment
             new_comment.post = post
-            # Save the comment to the database
             new_comment.save()
     else:
         comment_form = CommentForm()
-        
-        
+
     context = {
         'title': "Coursepage",
         'menu': menu,
@@ -134,6 +196,8 @@ def coursepage(request, id):
         'author': author,
     }
     return render(request, 'main/coursepage.html', context=context)
+
+
 
 @login_required
 def lesson(request, id):
@@ -205,32 +269,64 @@ def searchbar(request):
 
 
 
-def accountSettings(request):
-    post = Learner.objects.all().filter(user_id=request.user.pk)
-    if post:
-        print(post)
-        user = request.user.learner
-    else:
-        Learner.objects.create(user_id=request.user.pk, name=request.user.username, coins=100)
-        user = request.user.learner
+# def accountSettings(request):
+#     post = Learner.objects.all().filter(user_id=request.user.pk)
+#     if post:
+#         print(post)
+#         user = request.user.learner
+#     else:
+#         Learner.objects.create(user_id=request.user.pk, name=request.user.username, coins=100)
+#         user = request.user.learner
 
-    form = UpdateUserForm(instance=user)
+#     form = UpdateUserForm(instance=user)
+
+#     if request.method == "POST":
+#         form = UpdateUserForm(request.POST, request.FILES, instance=user)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('profile')
+#         else:
+#             print(form.errors)
+            
+#     context = {
+#         'title': "Edit Profile page",
+#         'form': form,
+
+#     }
+#     return render(request, 'main/accountSettings.html', context=context)
+def accountSettings(request):
+    user = request.user.learner
+
+    form = UpdateUserForm(request=request, instance=user)
 
     if request.method == "POST":
-        form = UpdateUserForm(request.POST, request.FILES, instance=user)
+        form = UpdateUserForm(request.POST, instance=user, request=request)
         if form.is_valid():
             form.save()
+
+            # Check if Instagram and TikTok cookies are already set for the user
+            instagram_cookie_set = request.COOKIES.get(f'instagram_added_coins_{request.user.pk}', False)
+            tiktok_cookie_set = request.COOKIES.get(f'tiktok_added_coins_{request.user.pk}', False)
+
+            if form.cleaned_data.get('instagram') and not instagram_cookie_set:
+                user.coins += 50
+                user.save()
+                response = redirect('profile')
+                response.set_cookie(f'instagram_added_coins_{request.user.pk}', True)
+                return response
+
+            if form.cleaned_data.get('tiktok') and not tiktok_cookie_set:
+                user.coins += 50
+                user.save()
+                response = redirect('profile')
+                response.set_cookie(f'tiktok_added_coins_{request.user.pk}', True)
+                return response
             return redirect('profile')
-        else:
-            print(form.errors)
-            
     context = {
         'title': "Edit Profile page",
         'form': form,
-
     }
     return render(request, 'main/accountSettings.html', context=context)
-
 
 
 def add_course_to_user(request, id):
