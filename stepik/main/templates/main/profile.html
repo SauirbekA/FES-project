@@ -130,7 +130,11 @@
                                                 <label>Instagram</label>
                                             </div>
                                             <div class="col-md-6">
-                                                <p><a href="tel:{{user.learner.coins}}">{{user.learner.instagram}}</a></p>
+                                                {% if user.learner.instagram %}
+                                                    <p><a href="tel:{{user.learner.coins}}">{{user.learner.instagram}}</a></p>
+                                                {% else %}
+                                                    <p>Get 50 coins by registering Instagram</p>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="row">
@@ -138,7 +142,11 @@
                                                 <label>Tiktok</label>
                                             </div>
                                             <div class="col-md-6">
-                                                <p><a href="tel:{{user.learner.coins}}">{{user.learner.tiktok}}</a></p>
+                                                {% if user.learner.tiktok %}
+                                                    <p><a href="tel:{{user.learner.coins}}">{{user.learner.tiktok}}</a></p>
+                                                {% else %}
+                                                    <p>Get 50 coins by registering TikTok</p>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="row">

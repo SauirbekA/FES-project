@@ -295,7 +295,10 @@ def searchbar(request):
 #     }
 #     return render(request, 'main/accountSettings.html', context=context)
 def accountSettings(request):
-    user = request.user.learner
+    try:
+        user = request.user.learner
+    except:
+        user = Learner.objects.create(user=request.user, coins=100)    
 
     form = UpdateUserForm(request=request, instance=user)
 
@@ -447,7 +450,40 @@ def top_page(request):
     courses_list = Course.objects.annotate(avg_rating=Avg('comments__rate')).order_by('-avg_rating')
     return render(request, 'main/top_page.html', {'courses_list': courses_list})
 
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from datetime import datetime, timedelta
 
+# @login_required
+# def game(request):
+#     score = request.POST.get('score', 0)  # Assuming you send the score as a POST parameter
+#     request.user.learner.coins += int(score)
+#     request.user.learner.save()
+
+#     return render(request, 'main/game.html', {'score': score})
+@login_required
+def game(request):
+    # Check the number of times the user has played today
+    user_key = f"game_access_{request.user.id}"
+    access_count = cache.get(user_key, 0)
+
+    # Allow access only twice a day
+    if access_count < 2:
+        # Increment the access count and set it to expire at the end of the day
+        cache.set(user_key, access_count + 1, timeout=timedelta(days=1).total_seconds())
+
+        # Process the score as before
+        score = request.POST.get('score', 0)
+        request.user.learner.coins += int(score)
+        request.user.learner.save()
+
+        return render(request, 'main/game.html', {'score': score})
+    else:
+        # Calculate the remaining time until the next try
+        current_time = datetime.now()
+        end_of_day = datetime(current_time.year, current_time.month, current_time.day, 23, 59, 59)
+        remaining_time = end_of_day - current_time
+        return render(request, 'main/game_limit_exceeded.html', {'remaining_time': remaining_time})
 
 
 

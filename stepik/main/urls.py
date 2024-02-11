@@ -26,6 +26,7 @@ urlpatterns = [
     path('my_view/<int:id>', views.my_view, name='my_view'),
     
     path('top_page/', views.top_page, name='top_page'),
+    path('game/', views.game, name='game'),
     
     # path('currency/', views.currency, name='currency'),
     
