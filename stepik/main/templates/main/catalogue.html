@@ -50,8 +50,10 @@
     <div class="row display-flex justify-content-start" align="center">
         
 {% block course %}
+
     {% for m in menu %}
-        <div class="col-lg-4 col-md-6 col-sm-12 mobiledevice">
+
+        <div class="col-lg-4 col-md-6 col-sm-12 mobiledevice border border-primary rounded">
             <article class="media content-section customhover" style="height: 95%;">
                 <div class="media-body">
                     
@@ -77,6 +79,8 @@
                 </div>
             </article>
         </div>
+
+
     {% endfor %}
 {% endblock course %}
     </div>

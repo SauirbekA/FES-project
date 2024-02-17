@@ -22,9 +22,11 @@ from django.db.models import Avg
 def mainpage(request):
     
     menu = Course.objects.all()
+    cats = Category.objects.all()
     context = {
         'title': 'Main Page',
         'menu': menu,
+        'cats': cats,
     }
     return render(request,'main/base.html', context=context)
 
@@ -245,15 +247,22 @@ def profile(request):
 #         return render(request, 'main/searchbar.html', {'post': post})
 
 def searchbar(request):
+    cats = Category.objects.all()
     if request.method == 'GET':
         search = request.GET.get('search')
         min_price = request.GET.get('min_price')
         max_price = request.GET.get('max_price')
         min_rating = request.GET.get('min_rating')
-
+        category = request.GET.get('category')
+        
         # Base queryset
         queryset = Course.objects.all().filter(title__contains=search, is_published=True)
 
+        
+        if category:
+            queryset = queryset.filter(cat=category)
+        print('CATEGORY: ', category)    
+                                           
         # Apply price filter
         if min_price is not None and min_price.isdigit():
             queryset = queryset.filter(price__gte=float(min_price))
@@ -264,7 +273,7 @@ def searchbar(request):
         if min_rating is not None and min_rating.isdigit():
             queryset = queryset.annotate(avg_rating=Avg("comments__rate")).filter(avg_rating__gte=float(min_rating))
 
-        return render(request, 'main/searchbar.html', {'post': queryset})
+        return render(request, 'main/searchbar.html', {'post': queryset,  'cats': cats})
 
 
 
@@ -474,7 +483,7 @@ def top_page(request):
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from datetime import datetime, timedelta
-
+import random
 # @login_required
 # def game(request):
 #     score = request.POST.get('score', 0)  # Assuming you send the score as a POST parameter
@@ -488,17 +497,15 @@ def game(request):
     user_key = f"game_access_{request.user.id}"
     access_count = cache.get(user_key, 0)
 
+    questions = Question.objects.all()
+    random_question = random.choice(questions) if questions else None
+    
     # Allow access only twice a day
     if access_count < 2:
         # Increment the access count and set it to expire at the end of the day
         cache.set(user_key, access_count + 1, timeout=timedelta(days=1).total_seconds())
-
-        # Process the score as before
-        score = request.POST.get('score', 0)
-        request.user.learner.coins += int(score)
-        request.user.learner.save()
-
-        return render(request, 'main/game.html', {'score': score})
+        
+        return render(request, 'main/game.html', {'question': random_question})
     else:
         # Calculate the remaining time until the next try
         current_time = datetime.now()
@@ -507,103 +514,17 @@ def game(request):
         return render(request, 'main/game_limit_exceeded.html', {'remaining_time': remaining_time})
 
 
+def check_answers(request, id):
+    if request.method == 'POST':
+        user_answer = request.POST.get('answer')
+        correct_answer = Question.objects.get(pk = id).correct_answer
 
-
-
-
-
-
-
-
-# def currency(request):
-#     driver = webdriver.Chrome()
-#     driver.get('https://ru.investing.com/currencies/usd-kzt?ysclid=le3xenttgf36537185')
-
-#     course = driver.find_element('xpath', "//span[contains(@class, 'text-2xl')]")
-#     resultk, resultu = 0, 0
-#     if request.method == 'POST':
-#         input_valuek = int(request.POST['input_valuek'])
-#         input_valueu = int(request.POST['input_valueu'])
-#         resultu = input_valuek * float(course.text[:3])
-#         resultk = float(course.text[:3]) // input_valueu
+        print('user: ', user_answer)
+        print('correct: ', correct_answer)
         
-    
-#     context = {
-#         'title': 'Main Page',
-#         'course': float(course.text[:3]),
-#         'result': resultk,
-#         'resultu': resultu,
-#     }
-#     return render(request,'main/currency.html', context=context)
+        if user_answer == correct_answer:
+            # Update user's coins if the answer is correct
+            request.user.learner.coins += 30
+            request.user.learner.save()
 
-
-# def cart(request):
-
-#     cartItems = Cart.objects.filter(idUser = request.user.pk)
-#     cart = []
-#     idc = []
-#     price = []
-#     for c in cartItems:
-#         course = Course.objects.filter(pk =c.idCourse)
-#         cart.append([course[0].title, course[0].price])
-#         idc.append(c.idCourse)
-#         price.append(course[0].price)
-#     overall = 0    
-#     for p in price:
-#         overall+=p
-            
-#     context = {
-#         'cart': cart,
-#         'price': price,
-#         'overall': overall,
-#         'idc': idc,
-#     }
-#     return render(request, 'main/cart.html', context)
-
-# def payall(request):
-#     user = request.user.pk
-#     cartItems = Cart.objects.filter(idUser = request.user.pk)
-    
-#     for c in cartItems:
-#         lesson = LessonContainer.objects.create(idUser=user, idCourse=c.idCourse)
-#         lesson.save()
-#         Cart.objects.filter(idCourse = c.idCourse).delete()
-    
-#     return redirect('profile')
-
-
-    
-    
-# class UserListAll(APIView):
-#     def get(self, request):
-#         users = User.objects.all()
-#         serializer = UserSerializer(users, many=True)
-#         return Response(serializer.data)   
-     
-#     def post(self, request):
-#         serializer = UserSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.save()
-#         return Response(model_to_dict(user))
-    
-    
-# import requests
-# from django.shortcuts import render
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-
-# class SendMessageView(APIView):
-#     def post(self, request, format=None):
-#         data = request.data
-#         # data = {'form': 'hello'}
-#         response = requests.post('http://localhost:4000/receive_message/', data=data)
-#         print('Proceed')
-#         return Response(response.json())
-
-# def map(request):
-#     context = {
-#         'title': 'Maps'
-#     } 
-    
-#     return render(request, 'main/map.html', context)
-
+    return redirect('game')
