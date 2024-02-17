@@ -337,10 +337,11 @@ def add_course_to_user(request, id):
     course = Course.objects.filter(pk = id).first()
     usera = User.objects.filter(id = course.idUser).first()
     if request.user.learner.coins >= course.price:
-        request.user.learner.coins -= course.price
-        usera.learner.coins += course.price
-        request.user.learner.save() 
-        usera.learner.save()
+        # request.user.learner.coins -= course.price
+        # usera.learner.coins += course.price
+        # request.user.learner.save() 
+        # usera.learner.save()
+        pass
     else:
         return redirect('profile')      
     if course.price > 0:
@@ -353,7 +354,14 @@ def add_course_to_user(request, id):
         
         
         
-def pay(request, id):   
+def pay(request, id):  
+    course = Course.objects.filter(pk = id).first()
+    usera = User.objects.filter(id = course.idUser).first()
+    if request.user.learner.coins >= course.price:
+        request.user.learner.coins -= course.price
+        usera.learner.coins += course.price
+        request.user.learner.save() 
+        usera.learner.save() 
     user = request.user.pk
     lesson = LessonContainer.objects.create(idUser=user, idCourse=id)
     name = Course.objects.filter(pk = id)
@@ -362,10 +370,23 @@ def pay(request, id):
     
 
 
+def remove_course(request, id):
+    context = {
+        'id': id,
+    }
+    return render(request, 'main/remove_course.html', context)
+    
+
+
 def delete_course_from_user(request, id):
     user = request.user.pk
     lesson = LessonContainer.objects.filter(idUser=user, idCourse=id).delete()
     return redirect('profile')
+    
+    
+    
+    
+    
     
     
     

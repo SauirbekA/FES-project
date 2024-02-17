@@ -18,6 +18,8 @@ urlpatterns = [
     path('add_course_to_user/<int:id>', views.add_course_to_user, name='add_course_to_user'),
     path('pay/<int:id>', views.pay, name= 'pay'),
     path('delete_course_from_user/<int:id>', views.delete_course_from_user, name='delete_course_from_user'),
+    path('remove_course/<int:id>', views.remove_course, name='remove_course'),
+    
     path('delete_course/<int:id>', views.delete_course, name='delete_course'),
     path('accept_course/<int:id>', views.accept_course, name='accept_course'),
     path('accountSettings', views.accountSettings, name='accountSettings'),
