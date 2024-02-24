@@ -17,7 +17,8 @@ class Course(models.Model):
     is_published = models.BooleanField(null=True, default=False)
     cat = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
     number = models.TextField()
-    
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
     def __str__(self):
         return self.title
 

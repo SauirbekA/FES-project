@@ -30,6 +30,8 @@ urlpatterns = [
     path('top_page/', views.top_page, name='top_page'),
     path('game/', views.game, name='game'),
     path('check_answers/<int:id>', views.check_answers, name='check_answers'),
+    path('notifications/', views.notifications, name='notifications'),
+
     
     # path('currency/', views.currency, name='currency'),
     

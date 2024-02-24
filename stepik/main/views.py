@@ -528,3 +528,14 @@ def check_answers(request, id):
             request.user.learner.save()
 
     return redirect('game')
+
+
+def notifications(request):
+    
+    latest_courses = Course.objects.filter(is_published=True).order_by('-created_at')[:5]
+
+    context = {
+        'latest_courses': latest_courses,
+    }
+    
+    return render(request, 'main/notifications.html', context)
