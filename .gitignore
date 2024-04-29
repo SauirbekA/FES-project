@@ -3,3 +3,4 @@ stepik/db.sqlite3
 *.sqlite3
 *.sqlite3
 /stepik/media
+*.sqlite3
